@@ -9,10 +9,11 @@ import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.server.ResponseStatusException;
 
 import com.ds.quackbooks.Models.Category;
 import com.ds.quackbooks.Services.CategoryService;
+
+import jakarta.validation.Valid;
 
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -35,29 +36,20 @@ public class CategoryController {
     }
 
     @PostMapping("/public/categories")
-    public ResponseEntity<?> createCategory(@RequestBody Category category) {
+    public ResponseEntity<?> createCategory(@Valid @RequestBody Category category) {
         service.createCategory(category);
         return new ResponseEntity<>("Category added succesfully", HttpStatus.CREATED);
     }
 
     @DeleteMapping("/public/categories/{id}")
     public ResponseEntity<?> deleteCategory(@PathVariable Long id){
-        try{
             String status = service.deleteCategory(id);
-
-            return ResponseEntity.status(HttpStatus.OK).body(status);
-        }catch(ResponseStatusException e){
-            return new ResponseEntity<>(e.getReason(), e.getStatusCode());
-        }
+            return new ResponseEntity<>(status, HttpStatus.OK);
     }
     
     @PutMapping("/public/categories/{id}")
-    public ResponseEntity<?> updateCategory(@RequestBody Category category, @PathVariable Long id) {
-        try{
-            service.updateCategory(category, id);
-            return new ResponseEntity<>("Category with category id: " + id, HttpStatus.OK);
-        } catch (ResponseStatusException e){
-            return new ResponseEntity<>(e.getReason(), e.getStatusCode());
-        }
+    public ResponseEntity<?> updateCategory(@Valid @RequestBody Category category, @PathVariable Long id) {
+        service.updateCategory(category, id);
+        return new ResponseEntity<>("Category with category id: " + id, HttpStatus.OK);
     }
 }
