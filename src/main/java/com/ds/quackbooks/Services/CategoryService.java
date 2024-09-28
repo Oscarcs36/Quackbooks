@@ -1,12 +1,11 @@
 package com.ds.quackbooks.Services;
 
-import java.util.List;
-
-import com.ds.quackbooks.Models.Category;
+import com.ds.quackbooks.payload.CategoryDTO;
+import com.ds.quackbooks.payload.CategoryResponse;
 
 public interface CategoryService {
-    List<Category> getAllCategories();
-    void createCategory(Category category);
-    String deleteCategory(Long id);
-    Category updateCategory(Category category, Long id);
+    CategoryResponse getAllCategories(Integer pageNumber, Integer pageSize,String sortBy, String sortOrder);
+    CategoryDTO createCategory(CategoryDTO categoryDTO);
+    CategoryDTO deleteCategory(Long id);
+    CategoryDTO updateCategory(CategoryDTO categoryDTO, Long id);
 }
