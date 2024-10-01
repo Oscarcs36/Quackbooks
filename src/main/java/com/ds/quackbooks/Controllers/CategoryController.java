@@ -1,4 +1,4 @@
-package com.ds.quackbooks.Controllers;
+package com.ds.quackbooks.controllers;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -8,10 +8,10 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.ds.quackbooks.Services.CategoryService;
 import com.ds.quackbooks.config.AppConstants;
 import com.ds.quackbooks.payload.CategoryDTO;
 import com.ds.quackbooks.payload.CategoryResponse;
+import com.ds.quackbooks.services.CategoryService;
 
 import jakarta.validation.Valid;
 
@@ -32,7 +32,7 @@ public class CategoryController {
     @GetMapping("/public/categories")
     public ResponseEntity<?> getAllCategories(@RequestParam(name = "page", defaultValue = AppConstants.PAGE_NUMBER, required = false) Integer pageNumber,
                                               @RequestParam(name = "size", defaultValue = AppConstants.PAGE_SIZE, required = false) Integer pageSize,
-                                              @RequestParam(name = "sortBy", defaultValue = AppConstants.SORT_CATEGORY_BY, required = false) String sortBy,
+                                              @RequestParam(name = "sortBy", defaultValue = AppConstants.SORT_CATEGORIES_BY, required = false) String sortBy,
                                               @RequestParam(name = "sortOrder", defaultValue = AppConstants.SORT_DIR, required = false) String sortOrder){
         CategoryResponse response = service.getAllCategories(pageNumber, pageSize, sortBy, sortOrder);
 

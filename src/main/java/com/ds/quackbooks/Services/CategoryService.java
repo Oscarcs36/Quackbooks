@@ -1,4 +1,4 @@
-package com.ds.quackbooks.Services;
+package com.ds.quackbooks.services;
 
 import com.ds.quackbooks.payload.CategoryDTO;
 import com.ds.quackbooks.payload.CategoryResponse;

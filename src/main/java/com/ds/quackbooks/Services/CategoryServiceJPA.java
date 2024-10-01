@@ -1,4 +1,4 @@
-package com.ds.quackbooks.Services;
+package com.ds.quackbooks.services;
 
 import java.util.List;
 
@@ -10,9 +10,9 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
-import com.ds.quackbooks.Models.Category;
 import com.ds.quackbooks.exceptions.APIException;
 import com.ds.quackbooks.exceptions.ResourceNotFoundException;
+import com.ds.quackbooks.models.Category;
 import com.ds.quackbooks.payload.CategoryDTO;
 import com.ds.quackbooks.payload.CategoryResponse;
 import com.ds.quackbooks.repositories.CategoryRepository;
@@ -20,16 +20,16 @@ import com.ds.quackbooks.repositories.CategoryRepository;
 @Service
 public class CategoryServiceJPA implements CategoryService{
     @Autowired
-    CategoryRepository repository;
+    private CategoryRepository repository;
 
     @Autowired
     private ModelMapper modelMapper;
 
     @Override
     public CategoryResponse getAllCategories(Integer pageNumber, Integer pageSize, String sortBy, String sortOrder) {
-        Sort sortByAndOrder = sortOrder.equals("asc") ? 
-                    Sort.by(sortBy).ascending() : 
-                    Sort.by(sortBy).descending();
+        Sort sortByAndOrder = sortOrder.equals("asc") 
+                ? Sort.by(sortBy).ascending()  
+                : Sort.by(sortBy).descending();
 
         Pageable pageDetails = PageRequest.of(pageNumber, pageSize, sortByAndOrder);
         Page<Category> page = repository.findAll(pageDetails);
@@ -57,9 +57,9 @@ public class CategoryServiceJPA implements CategoryService{
     public CategoryDTO createCategory(CategoryDTO categoryDTO) {
         Category category = modelMapper.map(categoryDTO, Category.class);
         Category checkCategory = repository.findByName(category.getName());
-        if(checkCategory != null){
+
+        if(checkCategory != null)
             throw new APIException("Category with name: " + category.getName() + " already exists");
-        }
 
         Category savedCategory = repository.save(category);
         return modelMapper.map(savedCategory, CategoryDTO.class);        
