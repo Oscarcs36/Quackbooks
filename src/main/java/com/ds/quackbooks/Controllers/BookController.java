@@ -2,6 +2,7 @@ package com.ds.quackbooks.controllers;
 
 import org.springframework.web.multipart.MultipartFile;
 
+import com.ds.quackbooks.config.AppConstants;
 import com.ds.quackbooks.payload.BookDTO;
 import com.ds.quackbooks.payload.BookResponse;
 import com.ds.quackbooks.services.BookService;
@@ -31,21 +32,32 @@ public class BookController {
     }
     
     @GetMapping("/public/books")
-    public ResponseEntity<?> getAllBooks() {
-        BookResponse bookResponse = service.getAllBooks();
+    public ResponseEntity<?> getAllBooks(@RequestParam(name = "page", defaultValue = AppConstants.PAGE_NUMBER, required = false) Integer pageNumber,
+                                         @RequestParam(name = "size", defaultValue = AppConstants.PAGE_SIZE, required = false) Integer pageSize,
+                                         @RequestParam(name = "sortBy", defaultValue = AppConstants.SORT_BOOKS_BY, required = false) String sortBy,
+                                         @RequestParam(name = "sortOrder", defaultValue = AppConstants.SORT_DIR, required = false) String sortOrder) {
+        BookResponse bookResponse = service.getAllBooks(pageNumber, pageSize, sortBy, sortOrder);
 
         return new ResponseEntity<>(bookResponse, HttpStatus.OK);
     }
 
     @GetMapping("/public/categories/{categoryId}/books")
-    public ResponseEntity<?> getBooksByCategory(@PathVariable Long categoryId) {
-        BookResponse bookResponse = service.searchByCategory(categoryId);
+    public ResponseEntity<?> getBooksByCategory(@PathVariable Long categoryId,
+                                                @RequestParam(name = "page", defaultValue = AppConstants.PAGE_NUMBER, required = false) Integer pageNumber,
+                                                @RequestParam(name = "size", defaultValue = AppConstants.PAGE_SIZE, required = false) Integer pageSize,
+                                                @RequestParam(name = "sortBy", defaultValue = AppConstants.SORT_BOOKS_BY, required = false) String sortBy,
+                                                @RequestParam(name = "sortOrder", defaultValue = AppConstants.SORT_DIR, required = false) String sortOrder) {
+        BookResponse bookResponse = service.searchByCategory(categoryId, pageNumber, pageSize, sortBy, sortOrder);
         return new ResponseEntity<>(bookResponse, HttpStatus.OK);
     }
 
     @GetMapping("/public/books/keyword/{keyword}")
-    public ResponseEntity<?> getBooksByKeyword(@PathVariable String keyword) {
-        BookResponse bookResponse = service.searchBookByKeyword(keyword);
+    public ResponseEntity<?> getBooksByKeyword(@PathVariable String keyword,
+                                                @RequestParam(name = "page", defaultValue = AppConstants.PAGE_NUMBER, required = false) Integer pageNumber,
+                                                @RequestParam(name = "size", defaultValue = AppConstants.PAGE_SIZE, required = false) Integer pageSize,
+                                                @RequestParam(name = "sortBy", defaultValue = AppConstants.SORT_BOOKS_BY, required = false) String sortBy,
+                                                @RequestParam(name = "sortOrder", defaultValue = AppConstants.SORT_DIR, required = false) String sortOrder) {
+        BookResponse bookResponse = service.searchBookByKeyword(keyword, pageNumber, pageSize, sortBy, sortOrder);
         return new ResponseEntity<>(bookResponse, HttpStatus.OK);
     }
 

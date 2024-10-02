@@ -5,6 +5,10 @@ import java.util.*;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -62,25 +66,49 @@ public class BookServiceJPA implements BookService{
     }
 
     @Override
-    public BookResponse getAllBooks() {
-        List<Book> books = bookRepository.findAll();
+    public BookResponse getAllBooks(Integer pageNumber, Integer pageSize, String sortBy, String sortOrder) {
+        Sort sortByAndOrder = sortOrder.equals("asc") 
+                ? Sort.by(sortBy).ascending()  
+                : Sort.by(sortBy).descending();
+        
+        Pageable pageDetails = PageRequest.of(pageNumber, pageSize, sortByAndOrder);
+        Page<Book> page = bookRepository.findAll(pageDetails);
+
+        List<Book> books = page.getContent();
+
+        if(books.isEmpty())
+            throw new APIException("No books created");
+
         List<BookDTO> booksDTO = books.stream()
                 .map(book -> modelMapper.map(book, BookDTO.class))
                 .toList();
 
-        if(booksDTO.isEmpty()) throw new APIException("No books exists");
-
         BookResponse bookResponse = new BookResponse();
         bookResponse.setContent(booksDTO);
+        bookResponse.setPageNumber(page.getNumber());
+        bookResponse.setPageSize(page.getSize());
+        bookResponse.setTotalElements(page.getTotalElements());
+        bookResponse.setTotalPages(page.getTotalPages());
+        bookResponse.setLastPage(page.isLast());
         return bookResponse;
     }
 
     @Override
-    public BookResponse searchByCategory(Long categoryId) {
+    public BookResponse searchByCategory(Long categoryId, Integer pageNumber, Integer pageSize, String sortBy, String sortOrder) {
         Category category = categoryRepository.findById(categoryId)
                 .orElseThrow(() -> new ResourceNotFoundException("category", "category_id", categoryId));
+                
+        Sort sortByAndOrder = sortOrder.equals("asc") 
+                ? Sort.by(sortBy).ascending()  
+                : Sort.by(sortBy).descending();
+        
+        Pageable pageDetails = PageRequest.of(pageNumber, pageSize, sortByAndOrder);
+        Page<Book> page = bookRepository.findByCategoryOrderByPriceAsc(category, pageDetails);
 
-        List<Book> books = bookRepository.findByCategoryOrderByPriceAsc(category);
+        List<Book> books = page.getContent();
+
+        if(books.isEmpty())
+            throw new APIException("No books created");
 
         List<BookDTO> booksDTO = books.stream()
                 .map(book -> modelMapper.map(book, BookDTO.class))
@@ -88,12 +116,27 @@ public class BookServiceJPA implements BookService{
 
         BookResponse bookResponse = new BookResponse();
         bookResponse.setContent(booksDTO);
+        bookResponse.setPageNumber(page.getNumber());
+        bookResponse.setPageSize(page.getSize());
+        bookResponse.setTotalElements(page.getTotalElements());
+        bookResponse.setTotalPages(page.getTotalPages());
+        bookResponse.setLastPage(page.isLast());
         return bookResponse;
     }
 
     @Override
-    public BookResponse searchBookByKeyword(String keyword) {
-        List<Book> books = bookRepository.findByNameLikeIgnoreCase('%' + keyword + '%');
+    public BookResponse searchBookByKeyword(String keyword, Integer pageNumber, Integer pageSize, String sortBy, String sortOrder) {
+        Sort sortByAndOrder = sortOrder.equals("asc") 
+                ? Sort.by(sortBy).ascending()  
+                : Sort.by(sortBy).descending();
+
+        Pageable pageDetails = PageRequest.of(pageNumber, pageSize, sortByAndOrder);
+        Page<Book> page = bookRepository.findByNameLikeIgnoreCase('%' + keyword + '%', pageDetails);
+
+        List<Book> books = page.getContent();
+
+        if(books.isEmpty())
+            throw new APIException("No books created");
 
         List<BookDTO> booksDTO = books.stream()
                 .map(book -> modelMapper.map(book, BookDTO.class))
