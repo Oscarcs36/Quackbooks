@@ -152,7 +152,7 @@ public class BookServiceJPA implements BookService{
         Book bookDB = bookRepository.findById(id)
             .orElseThrow(() -> new ResourceNotFoundException("Book", "id", id));
 
-        Book book = modelMapper.map(bookDB, Book.class);
+        Book book = modelMapper.map(bookDTO, Book.class);
 
         bookDB.setName(book.getName());
         bookDB.setImage(book.getImage());
