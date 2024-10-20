@@ -2,6 +2,8 @@ package com.ds.quackbooks.services;
 
 import java.io.IOException;
 import java.util.*;
+import java.util.stream.Collectors;
+
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -15,10 +17,13 @@ import org.springframework.web.multipart.MultipartFile;
 import com.ds.quackbooks.exceptions.APIException;
 import com.ds.quackbooks.exceptions.ResourceNotFoundException;
 import com.ds.quackbooks.models.Book;
+import com.ds.quackbooks.models.Cart;
 import com.ds.quackbooks.models.Category;
 import com.ds.quackbooks.payload.BookDTO;
 import com.ds.quackbooks.payload.BookResponse;
+import com.ds.quackbooks.payload.CartDTO;
 import com.ds.quackbooks.repositories.BookRepository;
+import com.ds.quackbooks.repositories.CartRepository;
 import com.ds.quackbooks.repositories.CategoryRepository;
 
 @Service
@@ -29,6 +34,12 @@ public class BookServiceJPA implements BookService{
 
     @Autowired
     private CategoryRepository categoryRepository;
+    
+    @Autowired
+    private CartRepository cartRepository;
+
+    @Autowired
+    private CartService cartService;
 
     @Autowired
     private ModelMapper modelMapper;
@@ -162,6 +173,21 @@ public class BookServiceJPA implements BookService{
 
         Book bookSaved = bookRepository.save(bookDB);
 
+        List<Cart> carts = cartRepository.findCartByBookId(id);
+
+        List<CartDTO> cartDTOs = carts.stream().map(cart -> {
+            CartDTO cartDTO = modelMapper.map(cart, CartDTO.class);
+
+            List<BookDTO> books = cart.getCartItems().stream()
+                .map(b -> modelMapper.map(b.getBook(), BookDTO.class)).collect(Collectors.toList());
+
+                cartDTO.setBooks(books);
+
+                return cartDTO;
+        }).collect(Collectors.toList());
+
+        cartDTOs.forEach(cart -> cartService.updateBookInCarts(cart.getId(), id));
+
         return modelMapper.map(bookSaved, BookDTO.class);
     }
 
@@ -169,6 +195,9 @@ public class BookServiceJPA implements BookService{
     public BookDTO deleteBook(Long id) {
         Book bookDB = bookRepository.findById(id)
             .orElseThrow(() -> new ResourceNotFoundException("Book", "id", id));
+
+        List<Cart> carts = cartRepository.findCartByBookId(id);
+        carts.forEach(cart -> cartService.deleteBookFromCart(cart.getId(), id));
 
         bookRepository.delete(bookDB);
         return modelMapper.map(bookDB, BookDTO.class);
