@@ -1,13 +1,12 @@
 package com.ds.quackbooks.models;
 
-import java.util.*;
-
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-import jakarta.persistence.ManyToMany;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
@@ -47,7 +46,6 @@ public class Address {
     private String externalNumber;
     
     @Column(name = "internal_number")
-    @NotNull
     private String internalNumber;
 
     @Column(name = "house_description")
@@ -55,8 +53,9 @@ public class Address {
     @Size(min = 5, max = 40)
     private String houseDescription;
 
-    @ManyToMany(mappedBy = "addresses")
-    private List<User> users = new ArrayList<>();
+    @ManyToOne
+    @JoinColumn(name = "user_id")
+    private User user;
 
     public Address(@NotBlank @Size(min = 5, max = 5) String zipCode, @NotBlank @Size(min = 3, max = 15) String state,
             @NotBlank @Size(min = 3, max = 15) String city, @NotBlank @Size(min = 5, max = 50) String street,
