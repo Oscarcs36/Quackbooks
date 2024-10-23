@@ -6,7 +6,4 @@ public class AppConstants {
     public static final String SORT_BOOKS_BY = "name";
     public static final String SORT_CATEGORIES_BY = "name";
     public static final String SORT_DIR = "asc";
-
-    
-    
 }
